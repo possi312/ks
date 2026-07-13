@@ -89,14 +89,34 @@
       color: #333;
     }
 
-    #resetAsset {
-      margin-top: 10px;
-      padding: 6px 12px;
-      background: #e25a5a;
-      color: #fff;
+    /* ★ レース開始ボタン（黄色背景＋白文字） */
+    #startBtn {
+      padding: 10px 20px;
+      background: #ffd633;   /* 黄色 */
+      color: #ffffff;        /* ← 白文字 */
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    #startBtn:hover {
+      background: #ffcc00;
+    }
+
+    /* ★ 総資産リセットボタン（白黒） */
+    #resetAsset {
+      margin-top: 10px;
+      padding: 6px 12px;
+      background: #ffffff;
+      color: #000000;
+      border: 2px solid #000;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #resetAsset:hover {
+      background: #e6e6e6;
     }
   </style>
 </head>
@@ -109,7 +129,7 @@
 
     <!-- ▼▼▼ 競馬ミニゲーム ▼▼▼ -->
     <section class="race-track">
-      <h2>自己賞</h2>
+      <h2>🎮 ぽっし杯ミニ競馬（逆転強化・複数加速・オッズ修正・総資産リセット）</h2>
 
       <div class="race-ui">
         <p>勝つ馬を予想して、賭け金を入力してからスタートしてください。</p>
@@ -189,7 +209,7 @@
     }
     updateRecord();
 
-    /* オッズ計算（勝率更新前の値を使うように修正） */
+    /* オッズ計算（勝率更新前の値を使う） */
     function calcOdds() {
       const totalWins = winCount.reduce((a,b)=>a+b,0) || 1;
       let odds = winCount.map(w => {
@@ -227,7 +247,7 @@
       let finished = false;
 
       /* ★ 複数頭のおいくらべ（2〜4頭） */
-      const sashiCount = Math.floor(Math.random() * 3) + 2; // 2〜4頭
+      const sashiCount = Math.floor(Math.random() * 3) + 2;
       const sashiHorses = [];
       while (sashiHorses.length < sashiCount) {
         const r = Math.floor(Math.random() * 5);
@@ -277,7 +297,7 @@
             if (betHorse === winner) {
               const payout = Math.floor(money * odds[index]);
               asset += payout;
-              result.textContent += ` 的中！ 配当：${payout}円`;
+              result.textContent += `的中！ 配当：${payout}円`;
             } else {
               asset -= money;
               result.textContent += "不的中...";
