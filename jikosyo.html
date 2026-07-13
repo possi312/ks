@@ -2,8 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>自己紹介 - aaaaaaaa
-  </title>
+  <title>自己紹介 - aaaaaaaa</title>
   <style>
     body {
       font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
@@ -63,11 +62,81 @@
       padding: 15px 0 25px;
     }
 
-    @media (max-width: 600px) {
-      .profile {
-        flex-direction: column;
-        text-align: center;
-      }
+    /* --- 競馬ゲーム用スタイル --- */
+    .race-track {
+      margin-top: 40px;
+      padding: 20px;
+      background: #eef6ff;
+      border-radius: 10px;
+    }
+
+    /* UI（説明・選択・ボタン・結果） */
+    .race-ui {
+      margin-bottom: 20px;
+    }
+
+    /* 馬が走るエリア（UIと完全に分離） */
+    .race-field {
+      position: relative;
+      background: #dff0ff;
+      height: 260px; /* ← 馬専用の広いスペース */
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    /* ゴール線 */
+    .goal-line {
+      position: absolute;
+      left: 650px; /* ← 奥に配置 */
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: red;
+    }
+
+    /* 馬 */
+    .horse {
+      width: 60px;
+      height: 40px;
+      background: #ffcc66;
+      border-radius: 8px;
+      text-align: center;
+      line-height: 40px;
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    /* 馬の位置（UIと絶対に重ならない） */
+    #horse1 { top: 40px; }
+    #horse2 { top: 120px; }
+    #horse3 { top: 200px; }
+
+    #startBtn {
+      padding: 10px 20px;
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    #startBtn:hover {
+      background: #357ac8;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    #record {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #444;
     }
   </style>
 </head>
@@ -77,8 +146,8 @@
   </header>
 
   <main>
+    <!-- ▼▼▼ 旅人さんの元の自己紹介部分（そのまま） ▼▼▼ -->
     <section class="profile">
-      <!-- アイコン画像を使う場合は src を差し替えてください -->
       <img src="https://via.placeholder.com/120" alt="">
       <div class="profile-text">
         <h2>ぽっし</h2>
@@ -111,10 +180,115 @@
         ・デザインやレイアウトも、少しずつ試行錯誤中です。
       </p>
     </section>
+    <!-- ▲▲▲ 元の自己紹介ここまで ▲▲▲ -->
+
+    <!-- ▼▼▼ 競馬ミニゲーム ▼▼▼ -->
+    <section class="race-track">
+      <h2>自己賞</h2>
+
+      <div class="race-ui">
+        <p>勝つ馬を予想してからスタートしてください。</p>
+
+        <select id="bet">
+          <option value="1">🐴 1号（スタミナ型）</option>
+          <option value="2">🐴 2号（瞬発型）</option>
+          <option value="3">🐴 3号（バランス型）</option>
+        </select>
+
+        <button id="startBtn">レース開始！</button>
+
+        <div id="result"></div>
+        <div id="record"></div>
+      </div>
+
+      <div class="race-field">
+        <div class="goal-line"></div>
+
+        <div id="horse1" class="horse">🐴 1号</div>
+        <div id="horse2" class="horse">🐴 2号</div>
+        <div id="horse3" class="horse">🐴 3号</div>
+      </div>
+    </section>
+    <!-- ▲▲▲ 競馬ミニゲームここまで ▲▲▲ -->
+
   </main>
 
   <footer>
     &copy; 2026 ぽっし
   </footer>
+
+  <script>
+    const horses = [
+      document.getElementById("horse1"),
+      document.getElementById("horse2"),
+      document.getElementById("horse3")
+    ];
+
+    const startBtn = document.getElementById("startBtn");
+    const result = document.getElementById("result");
+    const record = document.getElementById("record");
+    const bet = document.getElementById("bet");
+
+    const goalX = 650; // ← ゴール線の位置
+
+    let winCount = JSON.parse(localStorage.getItem("winCount")) || [0,0,0];
+
+    function updateRecord() {
+      record.textContent =
+        `勝率：1号 ${winCount[0]}勝 / 2号 ${winCount[1]}勝 / 3号 ${winCount[2]}勝`;
+    }
+    updateRecord();
+
+    startBtn.addEventListener("click", () => {
+      result.textContent = "";
+      horses.forEach(h => h.style.left = "0px");
+
+      let finished = false;
+
+      const sashiHorse = Math.floor(Math.random() * 3);
+      const sashiBoost = 3 + Math.random() * 3;
+
+      horses.forEach((horse, index) => {
+        let pos = 0;
+
+        const personality = [
+          2.2 + Math.random() * 1.5,
+          2.0 + Math.random() * 1.8,
+          2.1 + Math.random() * 1.6
+        ][index];
+
+        const timer = setInterval(() => {
+          pos += personality;
+
+          if (pos > goalX - 150 && index === sashiHorse) {
+            pos += sashiBoost;
+          }
+
+          horse.style.left = pos + "px";
+
+          /* ★ 馬の先頭（pos + 60）が線に触れた瞬間ゴール ★ */
+          if (pos + 60 >= goalX && !finished) {
+            finished = true;
+            clearInterval(timer);
+
+            const winner = index + 1;
+            result.textContent = `優勝：${winner}号！`;
+
+            winCount[index]++;
+            localStorage.setItem("winCount", JSON.stringify(winCount));
+            updateRecord();
+
+            if (Number(bet.value) === winner) {
+              result.textContent += " 的中！";
+            } else {
+              result.textContent += " 不的中...";
+            }
+          }
+
+          if (finished) clearInterval(timer);
+        }, 40);
+      });
+    });
+  </script>
 </body>
 </html>
