@@ -28,40 +28,6 @@
       border-radius: 8px;
     }
 
-    h1, h2 {
-      margin-top: 0;
-    }
-
-    .profile {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .profile img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #ddd;
-    }
-
-    .profile-text p {
-      margin: 4px 0;
-    }
-
-    ul {
-      padding-left: 20px;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 0.9rem;
-      color: #777;
-      padding: 15px 0 25px;
-    }
-
     /* --- 競馬ゲーム用スタイル --- */
     .race-track {
       margin-top: 40px;
@@ -70,32 +36,29 @@
       border-radius: 10px;
     }
 
-    /* UI（説明・選択・ボタン・結果） */
     .race-ui {
       margin-bottom: 20px;
     }
 
-    /* 馬が走るエリア（UIと完全に分離） */
     .race-field {
       position: relative;
       background: #dff0ff;
-      height: 260px; /* ← 馬専用の広いスペース */
+      height: 360px;
+      width: 800px;
       border-radius: 10px;
       overflow: hidden;
       margin-top: 20px;
     }
 
-    /* ゴール線 */
     .goal-line {
       position: absolute;
-      left: 650px; /* ← 奥に配置 */
+      left: 700px;
       top: 0;
       width: 4px;
       height: 100%;
       background: red;
     }
 
-    /* 馬 */
     .horse {
       width: 60px;
       height: 40px;
@@ -108,24 +71,11 @@
       font-weight: bold;
     }
 
-    /* 馬の位置（UIと絶対に重ならない） */
     #horse1 { top: 40px; }
-    #horse2 { top: 120px; }
-    #horse3 { top: 200px; }
-
-    #startBtn {
-      padding: 10px 20px;
-      background: #4a90e2;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    #startBtn:hover {
-      background: #357ac8;
-    }
+    #horse2 { top: 110px; }
+    #horse3 { top: 180px; }
+    #horse4 { top: 250px; }
+    #horse5 { top: 320px; }
 
     #result {
       margin-top: 15px;
@@ -133,10 +83,20 @@
       font-weight: bold;
     }
 
-    #record {
+    #record, #odds, #asset {
       margin-top: 10px;
       font-size: 1rem;
-      color: #444;
+      color: #333;
+    }
+
+    #resetAsset {
+      margin-top: 10px;
+      padding: 6px 12px;
+      background: #e25a5a;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -146,59 +106,32 @@
   </header>
 
   <main>
-    <!-- ▼▼▼ 旅人さんの元の自己紹介部分（そのまま） ▼▼▼ -->
-    <section class="profile">
-      <img src="https://via.placeholder.com/120" alt="">
-      <div class="profile-text">
-        <h2>ぽっし</h2>
-        <p>住んでいる場所：東京都</p>
-        <p>好きなこと：Web制作・ゲーム・音楽制作 など</p>
-      </div>
-    </section>
-
-    <section>
-      <h2>自己紹介</h2>
-      <p>
-        ぽっしです。<br>
-      </p>
-    </section>
-
-    <section>
-      <h2>趣味・興味</h2>
-      <ul>
-        <li>Web制作（HTML / CSS / JavaScript）</li>
-        <li>PCゲーム</li>
-        <li>音楽制作</li>
-        <li>3D制作（Mayaなど）</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>今取り組んでいること</h2>
-      <p>
-        ・JavaScript の勉強をしながら、ちょっとしたツールやページを作っています。<br>
-        ・デザインやレイアウトも、少しずつ試行錯誤中です。
-      </p>
-    </section>
-    <!-- ▲▲▲ 元の自己紹介ここまで ▲▲▲ -->
 
     <!-- ▼▼▼ 競馬ミニゲーム ▼▼▼ -->
     <section class="race-track">
       <h2>自己賞</h2>
 
       <div class="race-ui">
-        <p>勝つ馬を予想してからスタートしてください。</p>
+        <p>勝つ馬を予想して、賭け金を入力してからスタートしてください。</p>
 
         <select id="bet">
-          <option value="1">🐴 1号（スタミナ型）</option>
-          <option value="2">🐴 2号（瞬発型）</option>
-          <option value="3">🐴 3号（バランス型）</option>
+          <option value="1">🐴 1号</option>
+          <option value="2">🐴 2号</option>
+          <option value="3">🐴 3号</option>
+          <option value="4">🐴 4号</option>
+          <option value="5">🐴 5号</option>
         </select>
+
+        <input id="money" type="number" placeholder="賭け金（円）" min="1" style="margin-left:10px;">
 
         <button id="startBtn">レース開始！</button>
 
+        <div id="odds"></div>
         <div id="result"></div>
         <div id="record"></div>
+
+        <div id="asset"></div>
+        <button id="resetAsset">総資産をリセット</button>
       </div>
 
       <div class="race-field">
@@ -207,6 +140,8 @@
         <div id="horse1" class="horse">🐴 1号</div>
         <div id="horse2" class="horse">🐴 2号</div>
         <div id="horse3" class="horse">🐴 3号</div>
+        <div id="horse4" class="horse">🐴 4号</div>
+        <div id="horse5" class="horse">🐴 5号</div>
       </div>
     </section>
     <!-- ▲▲▲ 競馬ミニゲームここまで ▲▲▲ -->
@@ -221,47 +156,105 @@
     const horses = [
       document.getElementById("horse1"),
       document.getElementById("horse2"),
-      document.getElementById("horse3")
+      document.getElementById("horse3"),
+      document.getElementById("horse4"),
+      document.getElementById("horse5")
     ];
 
     const startBtn = document.getElementById("startBtn");
     const result = document.getElementById("result");
     const record = document.getElementById("record");
+    const oddsBox = document.getElementById("odds");
     const bet = document.getElementById("bet");
+    const moneyInput = document.getElementById("money");
+    const assetBox = document.getElementById("asset");
+    const resetAssetBtn = document.getElementById("resetAsset");
 
-    const goalX = 650; // ← ゴール線の位置
+    const goalX = 700;
 
-    let winCount = JSON.parse(localStorage.getItem("winCount")) || [0,0,0];
+    /* ★ 総資産（初期値 10000円）を保存 ★ */
+    let asset = Number(localStorage.getItem("asset")) || 10000;
+
+    function updateAsset() {
+      assetBox.textContent = `総資産：${asset}円`;
+    }
+    updateAsset();
+
+    /* 勝率記録（5頭） */
+    let winCount = JSON.parse(localStorage.getItem("winCount5")) || [0,0,0,0,0];
 
     function updateRecord() {
       record.textContent =
-        `勝率：1号 ${winCount[0]}勝 / 2号 ${winCount[1]}勝 / 3号 ${winCount[2]}勝`;
+        `勝率：1号 ${winCount[0]}勝 / 2号 ${winCount[1]}勝 / 3号 ${winCount[2]}勝 / 4号 ${winCount[3]}勝 / 5号 ${winCount[4]}勝`;
     }
     updateRecord();
 
+    /* オッズ計算（勝率更新前の値を使うように修正） */
+    function calcOdds() {
+      const totalWins = winCount.reduce((a,b)=>a+b,0) || 1;
+      let odds = winCount.map(w => {
+        const rate = w / totalWins;
+        const o = 1 / (rate + 0.05);
+        return Math.min(Math.max(o, 1.1), 10).toFixed(1);
+      });
+
+      oddsBox.textContent =
+        `オッズ：1号 ${odds[0]}倍 / 2号 ${odds[1]}倍 / 3号 ${odds[2]}倍 / 4号 ${odds[3]}倍 / 5号 ${odds[4]}倍`;
+
+      return odds;
+    }
+    let odds = calcOdds();
+
+    /* 総資産リセット */
+    resetAssetBtn.addEventListener("click", () => {
+      asset = 10000;
+      localStorage.setItem("asset", asset);
+      updateAsset();
+      alert("総資産をリセットしました");
+    });
+
+    /* レース開始 */
     startBtn.addEventListener("click", () => {
+      const money = Number(moneyInput.value);
+      if (!money || money <= 0) {
+        alert("賭け金を入力してください！");
+        return;
+      }
+
       result.textContent = "";
       horses.forEach(h => h.style.left = "0px");
 
       let finished = false;
 
-      const sashiHorse = Math.floor(Math.random() * 3);
-      const sashiBoost = 3 + Math.random() * 3;
+      /* ★ 複数頭のおいくらべ（2〜4頭） */
+      const sashiCount = Math.floor(Math.random() * 3) + 2; // 2〜4頭
+      const sashiHorses = [];
+      while (sashiHorses.length < sashiCount) {
+        const r = Math.floor(Math.random() * 5);
+        if (!sashiHorses.includes(r)) sashiHorses.push(r);
+      }
+
+      /* ★ 馬ごとに加速量を変える（6〜12px） */
+      const sashiBoosts = Array.from({length:5}, () => 6 + Math.random() * 6);
+
+      /* ★ personality を少し弱めて逃げ馬を抑える */
+      const personalities = [
+        1.8 + Math.random() * 1.2,
+        1.7 + Math.random() * 1.4,
+        1.9 + Math.random() * 1.3,
+        1.6 + Math.random() * 1.5,
+        1.7 + Math.random() * 1.4
+      ];
 
       horses.forEach((horse, index) => {
         let pos = 0;
 
-        const personality = [
-          2.2 + Math.random() * 1.5,
-          2.0 + Math.random() * 1.8,
-          2.1 + Math.random() * 1.6
-        ][index];
-
         const timer = setInterval(() => {
-          pos += personality;
+          pos += personalities[index];
 
-          if (pos > goalX - 150 && index === sashiHorse) {
-            pos += sashiBoost;
+          /* ★ 終盤加速の発動位置を早める（ゴール前250px） */
+          if (pos > goalX - 250 && sashiHorses.includes(index)) {
+            pos += sashiBoosts[index];
           }
 
           horse.style.left = pos + "px";
@@ -274,15 +267,27 @@
             const winner = index + 1;
             result.textContent = `優勝：${winner}号！`;
 
+            /* ★ 勝率更新（オッズ計算はこの後） */
             winCount[index]++;
-            localStorage.setItem("winCount", JSON.stringify(winCount));
+            localStorage.setItem("winCount5", JSON.stringify(winCount));
             updateRecord();
 
-            if (Number(bet.value) === winner) {
-              result.textContent += " 的中！";
+            /* ★ 資産計算（勝率更新前のオッズを使う） */
+            const betHorse = Number(bet.value);
+            if (betHorse === winner) {
+              const payout = Math.floor(money * odds[index]);
+              asset += payout;
+              result.textContent += ` 的中！ 配当：${payout}円`;
             } else {
-              result.textContent += " 不的中...";
+              asset -= money;
+              result.textContent += "不的中...";
             }
+
+            localStorage.setItem("asset", asset);
+            updateAsset();
+
+            /* ★ 勝率更新後にオッズ再計算（次回用） */
+            odds = calcOdds();
           }
 
           if (finished) clearInterval(timer);
