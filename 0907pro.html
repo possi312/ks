@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Canvasテスト</title>
+  <style>
+    body {
+      background-color: #ddd;
+    }
+    canvas {
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="paper">Canvas not supported!</canvas>
+  <script>
+    function loop() {
+      var paper = document.getElementById('paper');
+      if (typeof paper.getContext === 'undefined') {
+        return;
+      }
+      var context = paper.getContext('2d');
+      paper.width = 400;
+      paper.height = 200;
+      var w = paper.width;
+      var h = paper.height;
+      var x = 0;
+      var speed = 2;
+
+      (function render() {
+        context.clearRect(0, 0, w, h);
+        context.beginPath();
+        context.arc(x, 150, 50, 0, 2 * Math.PI, false);
+        context.fillStyle = '#ff0000';
+        context.fill();
+
+        if (x > paper.width + 50) {
+          x = -50;
+        } else {
+          x += speed;
+        }
+        requestAnimationFrame(render);
+      })();
+    }
+    loop();
+  </script>
+</body>
+</html>
